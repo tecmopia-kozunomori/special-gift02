@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>特別クーポン - テクモピア</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        /* === 🎨 カラースキームと基本設定 === */
+        :root {
+            --main-bg: #fce4ec;
+            --container-bg: #ffffff;
+            --primary: #ff4081;
+            --primary-dark: #c2185b;
+            --accent: #00bcd4;
+            --accent-dark: #0097a7;
+            --warning: #d32f2f;
+            --text-color: #333333;
+            --jp-font: 'M PLUS Rounded 1c', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: var(--jp-font);
+            background-color: var(--main-bg);
+            margin: 0; padding: 0;
+            color: var(--text-color);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow-x: hidden;
+            user-select: none; -webkit-user-select: none;
+        }
+
+        /* === 📱 メインコンテナ === */
+        .ticket-container {
+            background: var(--container-bg);
+            width: 92%; max-width: 380px;
+            border-radius: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            overflow: hidden; text-align: center;
+            border: 4px solid var(--primary);
+            position: relative; margin: 20px auto;
+        }
+
+        /* === 🎀 ヘッダー＆不正防止バー === */
+        .header {
+            background: linear-gradient(135deg, var(--primary), #ff80ab);
+            color: #fff; padding: 12px; font-weight: 900;
+            font-size: 1.1rem; border-bottom: 4px solid var(--primary-dark);
+        }
+
+        .anti-fraud-bar {
+            background: repeating-linear-gradient(45deg, var(--primary), var(--primary) 15px, #ff80ab 15px, #ff80ab 30px);
+            background-size: 42px 42px; animation: moveStripes 1s linear infinite;
+            height: 10px; width: 100%; margin-bottom: 15px;
+        }
+        @keyframes moveStripes { from { background-position: 0 0; } to { background-position: 42px 0; } }
+
+        .content { padding: 0 20px 24px; }
+
+        /* === 🎁 見出しアニメーション === */
+        .promo-header { margin: 15px 0 25px; animation: bouncePop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .promo-sub {
+            font-size: 0.95rem; color: #fff; font-weight: 900; display: inline-block;
+            background: #ff5252; padding: 4px 16px; border-radius: 30px;
+            margin-bottom: 10px; box-shadow: 0 4px 0 #d32f2f;
+            letter-spacing: 1px;
+        }
+        .promo-main { 
+            font-size: 1.4rem; 
+            color: #d84315; font-weight: 900; line-height: 1.4;
+            background: linear-gradient(transparent 50%, #fff9c4 50%); display: inline-block;
+            text-shadow: 2px 2px 0px #ffe0b2, 0 4px 10px rgba(255, 64, 129, 0.2);
+            margin: 0; padding: 5px;
+        }
+        @keyframes bouncePop {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* === 🎫 チケット風デザイン === */
+        .ticket-box {
+            background: linear-gradient(135deg, #fffde7, #fff9c4);
+            border: 3px dashed #fbc02d; border-radius: 16px;
+            padding: 25px 15px; margin: 20px 0; position: relative; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        /* ✨ キラッと光るシャインエフェクト */
+        .ticket-box::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg); animation: shine 3s infinite; z-index: 1;
+        }
+        @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+
+        /* USEDスタンプ */
+        .ticket-box.used::after {
+            content: 'USED'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            color: rgba(211, 47, 47, 0.85); font-size: 4rem; font-weight: 900;
+            border: 8px solid rgba(211, 47, 47, 0.85); padding: 5px 20px;
+            border-radius: 15px; z-index: 10; font-family: 'Arial Black', sans-serif;
+            animation: stampDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes stampDown { 
+            0% { transform: translate(-50%, -50%) scale(3) rotate(0); opacity: 0; } 
+            100% { transform: translate(-50%, -50%) scale(1) rotate(-20deg); opacity: 1; } 
+        }
+
+        .ticket-label { background: #ffe0b2; color: #e65100; padding: 4px 15px; border-radius: 20px; font-size: 0.95rem; font-weight: 900; position: relative; z-index: 2; }
+        .ticket-title { font-size: 1.8rem; font-weight: 900; color: #d84315; margin: 15px 0 0; line-height: 1.2; position: relative; z-index: 2; }
+
+        /* === ⏳ タイマー === */
+        .timer-box {
+            background: #222; color: #fff; padding: 12px; border-radius: 14px;
+            margin: 20px 0; border: 2px solid var(--primary);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .timer-label { font-size: 0.8rem; color: #ffab91; font-weight: bold; margin-bottom: 2px; }
+        .timer-value { font-size: 2.2rem; font-weight: bold; color: #f1c40f; font-family: monospace; letter-spacing: 2px; }
+
+        /* === 🔘 ボタン === */
+        .btn {
+            background: linear-gradient(135deg, var(--primary), #f50057);
+            color: #fff; border: none; padding: 14px 10px; width: 100%;
+            border-radius: 40px; box-shadow: 0 6px 0 var(--primary-dark);
+            cursor: pointer; transition: 0.1s;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            line-height: 1.2;
+        }
+        .btn:active { transform: translateY(4px) scale(0.98); box-shadow: 0 2px 0 var(--primary-dark); animation: none; }
+        .btn-main-text { font-size: 1.3rem; font-weight: 900; }
+        .btn-sub-text { font-size: 0.9rem; font-weight: bold; margin-top: 2px; opacity: 0.95; }
+        
+        @keyframes pulse-main {
+            0% { transform: scale(1); box-shadow: 0 6px 0 var(--accent-dark); }
+            50% { transform: scale(1.02); box-shadow: 0 10px 20px rgba(0, 188, 212, 0.4), 0 6px 0 var(--accent-dark); }
+            100% { transform: scale(1); box-shadow: 0 6px 0 var(--accent-dark); }
+        }
+        
+        @keyframes pulse-outline {
+            0% { transform: scale(1); box-shadow: 0 4px 0 var(--accent-dark); }
+            50% { transform: scale(1.03); box-shadow: 0 6px 12px rgba(0, 188, 212, 0.3), 0 4px 0 var(--accent-dark); }
+            100% { transform: scale(1); box-shadow: 0 4px 0 var(--accent-dark); }
+        }
+
+        .use-btn-animated { animation: pulse-main 2s infinite; }
+        .btn-outline {
+            background: #fff; color: var(--accent-dark); border: 2px solid var(--accent);
+            padding: 12px; font-size: 1rem; font-weight: 900; border-radius: 30px; 
+            box-shadow: 0 4px 0 var(--accent-dark); margin-bottom: 20px;
+            display: block; width: 100%; cursor: pointer;
+            animation: pulse-outline 2.5s infinite;
+        }
+        .btn-outline:active { transform: translateY(3px) scale(0.98); box-shadow: 0 1px 0 var(--accent-dark); animation: none; }
+        .btn:disabled { animation: none !important; transform: none !important; }
+
+        .small-notice { font-size: 0.75rem; color: var(--warning); font-weight: bold; margin-top: 12px; line-height: 1.4; }
+
+        /* === 📱 モーダル === */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: none; justify-content: center;
+            align-items: center; z-index: 2000; padding: 20px; backdrop-filter: blur(4px);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .overlay.show { display: flex; opacity: 1; }
+        
+        .modal {
+            background: #fff; width: 100%; max-width: 340px; border-radius: 24px;
+            padding: 24px; text-align: center; border: 4px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: translateY(20px) scale(0.95); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .overlay.show .modal { transform: translateY(0) scale(1); }
+        .modal-btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-btn-group .btn { flex: 1; }
+        .usage-img { width: 100%; max-width: 220px; border-radius: 12px; border: 1px solid #ddd; margin: 12px auto; display: block; }
+
+        /* === 📺 画面制御 === */
+        .screen { display: none; }
+        .active-screen { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .status-icon { font-size: 4rem; display: block; margin-bottom: 10px; }
+        
+        /* 開発用デバッグ表示（本番は消してもOK） */
+        #fp-display { font-size: 0.6rem; color: #ccc; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="ticket-container">
+        <div class="header">テクモピア 公津の杜</div>
+        
+        <div class="content">
+            
+            <div id="screen-step1" class="screen">
+                <div class="anti-fraud-bar"></div>
+                <div class="promo-header">
+                    <span class="promo-sub">このポスターを見つけた人限定！</span>
+                    <h2 class="promo-main">3階テクモピアで使える<br><span style="font-size: 2rem;">クレーンゲーム<br>1回無料クーポン</span><br>プレゼント！</h2>
+                </div>
+                <div style="background:#f1f8e9; padding:12px; border-radius:12px; color:#1b5e20; font-weight:900; font-size:0.95rem; line-height:1.4;">
+                    【ステップ 1】<br>3階カウンターのスタッフに<br>この画面を見せてください。
+                </div>
+                <div class="timer-box">
+                    <div class="timer-label">⏱️ 発券の有効期限</div>
+                    <div id="timer-p1" class="timer-value">10:00</div>
+                </div>
+                <button class="btn" onclick="openModal('confirm-issue')">
+                    <span class="btn-main-text">スタッフが確認</span>
+                    <span class="btn-sub-text">(クーポン発行)</span>
+                </button>
+                <div class="small-notice">注意：ここから先はスタッフが操作します。<br>お客様が押すと無効になる場合があります。</div>
+                <div id="fp-display"></div>
+            </div>
+
+            <div id="screen-step2" class="screen">
+                <div class="anti-fraud-bar" style="background: repeating-linear-gradient(45deg, var(--accent), var(--accent) 15px, #80deea 15px, #80deea 30px);"></div>
+                <div id="ticket" class="ticket-box">
+                    <span class="ticket-label">発券完了</span>
+                    <h2 class="ticket-title">クレーンゲーム<br>1回無料</h2>
+                </div>
+                <button class="btn-outline" onclick="openModal('usage-modal')">
+                    ✨ クーポンの使いかたを見る
+                </button>
+                <div style="background:#e3f2fd; padding:12px; border-radius:12px; color:#1565c0; font-weight:900; font-size:0.95rem; line-height: 1.4;">
+                    【ステップ 2】<br>遊ぶ台を決めてスタッフを呼び、<br>この画面を見せてください。
+                </div>
+                <div class="timer-box" style="border-color: var(--accent);">
+                    <div class="timer-label" style="color:#b2ebf2;">⏱️ クーポンの利用期限</div>
+                    <div id="timer-p2" class="timer-value" style="color:#26a69a;">30:00</div>
+                </div>
+                <button id="use-btn" class="btn use-btn-animated" style="background:linear-gradient(135deg, var(--accent), var(--accent-dark));" onclick="openModal('confirm-use')">
+                    <span class="btn-main-text" style="margin-top: 5px;">クーポンを使用</span>
+                </button>
+                <div class="small-notice">注意：必ずスタッフを呼んでから押してください。<br>事前にお客様自身で押すと無効となります。</div>
+            </div>
+
+            <div id="screen-expired-p1" class="screen" style="padding: 40px 0;">
+                <span class="status-icon">⚠️</span>
+                <h3 style="font-weight:900; color:#333;">発券期限が切れました</h3>
+                <p style="font-weight:bold; color:#666; font-size:0.9rem;">もう一度二次元コードを<br>読み取るところからやり直してね。</p>
+            </div>
+
+            <div id="screen-expired-p2" class="screen" style="padding: 40px 0;">
+                <span class="status-icon">❌</span>
+                <h3 style="font-weight:900; color:#333;">利用期限が切れました</h3>
+                <p style="font-weight:bold; color:#666; font-size:0.9rem;">30分を過ぎたため、<br>このクーポンは消失しました。</p>
+            </div>
+
+            <div id="screen-already" class="screen" style="padding: 40px 0;">
+                <span class="status-icon">🌟</span>
+                <h3 style="font-weight:900; color:#333;">本日は利用済みです</h3>
+                <p style="font-weight:bold; color:#666; font-size:0.9rem;">このクーポンの利用は1日1回までです。<br>また明日遊びに来てね！🧸</p>
+            </div>
+
+            <div id="screen-shared" class="screen" style="padding: 40px 0;">
+                <span class="status-icon">🚫</span>
+                <h3 style="font-weight:900; color:#333;">直接アクセスできません</h3>
+                <p style="font-weight:bold; color:#666; font-size:0.9rem;">このページは共有されたリンクからは<br>開くことができません。<br>二次元コードから読み取ってね。</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="confirm-issue" class="overlay">
+        <div class="modal">
+            <h3 style="color:var(--warning); font-weight:900; margin-top:0;">スタッフ専用確認</h3>
+            <p style="font-weight:bold; line-height:1.5; color:#444;">お客様が3階カウンターに<br>到着したことを確認しましたか？</p>
+            <div class="modal-btn-group">
+                <button class="btn" style="padding:12px; font-size:1rem; box-shadow:0 4px 0 var(--primary-dark);" onclick="issueTicket()"><span class="btn-main-text">はい(発券)</span></button>
+                <button class="btn" style="background:#e0e0e0; color:#333; padding:12px; font-size:1rem; box-shadow:0 4px 0 #9e9e9e;" onclick="closeModal()"><span class="btn-main-text">戻る</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirm-use" class="overlay">
+        <div class="modal">
+            <h3 style="color:var(--accent); font-weight:900; margin-top:0;">クーポンを使用します</h3>
+            <p style="font-weight:bold; line-height:1.5; color:#444;">クーポンを使用するゲーム機を決め、<br>スタッフに確認しましたか？</p>
+            <div class="modal-btn-group">
+                <button class="btn" style="background:var(--accent); box-shadow:0 4px 0 var(--accent-dark); padding:12px; font-size:1rem;" onclick="executeUse()"><span class="btn-main-text">はい(使用)</span></button>
+                <button class="btn" style="background:#e0e0e0; color:#333; padding:12px; font-size:1rem; box-shadow:0 4px 0 #9e9e9e;" onclick="closeModal()"><span class="btn-main-text">戻る</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="usage-modal" class="overlay">
+        <div class="modal" style="text-align:left; max-width:340px; padding: 25px 20px;">
+            <h3 style="text-align:center; color:var(--accent-dark); font-weight:900; margin:0 0 15px 0; background:#e0f7fa; padding:8px; border-radius:10px;">✨ 使いかた ✨</h3>
+            <p style="font-size:0.95rem; font-weight:bold; margin:10px 0; color:#333;">① 遊びたいクレーンゲーム機を選びます。</p>
+            <p style="font-size:0.8rem; color:var(--primary); font-weight:bold; margin-left:1.2em;">※下のマークがある台が対象です。</p>
+            <img src="https://raw.githubusercontent.com/tecmopia-kozunomori/special-gift/refs/heads/main/1play.png" class="usage-img" alt="1playマーク">
+            <p style="font-size:0.95rem; font-weight:bold; margin:15px 0 10px; color:#333;">② 場所が決まったらスタッフをお呼びください。</p>
+            <p style="font-size:0.95rem; font-weight:bold; margin:10px 0; color:#333;">③ スタッフの前で「クーポンを使用」を押します。</p>
+            <button class="btn" style="background:#eee; color:#333; padding:12px; font-size:1rem; box-shadow:0 4px 0 #ccc; margin-top:20px;" onclick="closeModal()"><span class="btn-main-text">とじる</span></button>
+        </div>
+    </div>
+
+    <script>
+        const P1_LIMIT = 600;  // 10分（600秒）
+        const P2_LIMIT = 1800; // 30分（1800秒）
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxM1zkvN7MjBKQ1SC-63l5NU5_ZBwpduKdPSBN55G5alRxEA6yhh2K3HUObxCe-i4ol/exec';
+        
+        let timer = null;
+        let deviceFingerprint = "unknown";
+
+        function getToday() {
+            return new Date().toLocaleDateString('ja-JP');
+        }
+
+        /* ============================================================
+           🛡️ 不正対策: ブラウザ・フィンガープリント生成関数
+        ============================================================ */
+        async function generateDeviceFingerprint() {
+            return new Promise((resolve) => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 200; canvas.height = 50;
+                    ctx.textBaseline = "top";
+                    ctx.font = "14px 'Arial'";
+                    ctx.fillStyle = "#f60"; ctx.fillRect(125,1,62,20);
+                    ctx.fillStyle = "#069"; ctx.fillText("tecmopia-gift", 2, 15);
+                    ctx.fillStyle = "rgba(102, 204, 0, 0.7)"; ctx.fillText("tecmopia-gift", 4, 17);
+                    const canvasData = canvas.toDataURL();
+
+                    const dataString = [
+                        navigator.userAgent,
+                        navigator.language,
+                        screen.width + "x" + screen.height,
+                        screen.colorDepth,
+                        Intl.DateTimeFormat().resolvedOptions().timeZone,
+                        canvasData
+                    ].join('|||');
+
+                    let hash = 0;
+                    for (let i = 0; i < dataString.length; i++) {
+                        const char = dataString.charCodeAt(i);
+                        hash = ((hash << 5) - hash) + char;
+                        hash = hash & hash; 
+                    }
+                    resolve(Math.abs(hash).toString(16));
+                } catch (e) {
+                    resolve('err-' + Date.now());
+                }
+            });
+        }
+
+        /* 🛡️ 多重ストレージ保存・取得・削除（同じサイト内での利用制限共有のため、接頭辞を tp_ に戻しました） */
+        function setPersistentState(key, value) {
+            try { localStorage.setItem(key, value); } catch(e){}
+            try { sessionStorage.setItem(key, value); } catch(e){}
+            document.cookie = `${key}=${value}; max-age=86400; path=/`;
+        }
+
+        function getPersistentState(key) {
+            let val = null;
+            try { val = localStorage.getItem(key); } catch(e){}
+            if (!val) { try { val = sessionStorage.getItem(key); } catch(e){} }
+            if (!val) {
+                const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
+                if (match) val = match[2];
+            }
+            return val;
+        }
+
+        function removePersistentState(key) {
+            try { localStorage.removeItem(key); } catch(e){}
+            try { sessionStorage.removeItem(key); } catch(e){}
+            document.cookie = `${key}=; max-age=0; path=/`;
+        }
+
+        // 初期化処理
+        window.onload = async function() {
+            try {
+                deviceFingerprint = await generateDeviceFingerprint();
+                const fpDisplay = document.getElementById('fp-display');
+                if(fpDisplay) fpDisplay.innerText = "ID: " + deviceFingerprint;
+
+                const params = new URLSearchParams(window.location.search);
+                const token = params.get('token');
+                const today = getToday();
+
+                // 🚨 1. QRコードからの正規アクセス時の処理
+                if (token === 'secret123') {
+                    setPersistentState('tp_auth_' + today, 'true');
+                    
+                    const currentPhase = getPersistentState('tp_phase_' + today);
+                    if (!currentPhase || currentPhase === 'p1' || currentPhase === 'expired-p1') {
+                        setPersistentState('tp_phase_' + today, 'p1');
+                        removePersistentState('tp_p1_start_' + today); 
+                    }
+                    
+                    try {
+                        const randomStr = Math.random().toString(36).substring(2, 10);
+                        window.history.replaceState(null, '', '?ticket=' + randomStr);
+                    } catch(e) {}
+                } else if (window.location.search.length > 0 && !params.has('ticket')) {
+                    showScreen('screen-shared');
+                    return;
+                }
+
+                // 🚨 2. 本日の正規アクセス認証があるかチェック
+                if (getPersistentState('tp_auth_' + today) !== 'true') {
+                    showScreen('screen-shared');
+                    return;
+                }
+
+                // 🚨 3. 現在のフェーズから画面を完全復元
+                const phase = getPersistentState('tp_phase_' + today) || 'p1';
+                
+                if (phase === 'p1') {
+                    showScreen('screen-step1');
+                    startTimer('tp_p1_start_' + today, P1_LIMIT, 'timer-p1', 'screen-expired-p1', 'expired-p1');
+                } else if (phase === 'p2') {
+                    showScreen('screen-step2');
+                    startTimer('tp_p2_start_' + today, P2_LIMIT, 'timer-p2', 'screen-expired-p2', 'expired-p2');
+                } else if (phase === 'used') {
+                    showScreen('screen-already');
+                } else if (phase === 'expired-p1') {
+                    showScreen('screen-expired-p1');
+                } else if (phase === 'expired-p2') {
+                    showScreen('screen-expired-p2');
+                }
+
+            } catch(error) {
+                console.error("システム復旧モード:", error);
+                showScreen('screen-step1');
+                startTimer('tp_p1_start_' + getToday(), P1_LIMIT, 'timer-p1', 'screen-expired-p1', 'expired-p1');
+            }
+        };
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            const target = document.getElementById(id);
+            if (target) target.classList.add('active-screen');
+        }
+
+        function startTimer(storageKey, limit, elementId, expiredScreenId, expiredPhaseValue) {
+            if (timer) clearInterval(timer);
+            
+            let start = getPersistentState(storageKey);
+            if (!start) {
+                start = Date.now();
+                setPersistentState(storageKey, start);
+            }
+
+            const el = document.getElementById(elementId);
+            
+            timer = setInterval(() => {
+                const now = Date.now();
+                const diff = Math.floor((now - start) / 1000);
+                const left = limit - diff;
+                const today = getToday();
+
+                if (getPersistentState('tp_auth_' + today) !== 'true') {
+                    clearInterval(timer);
+                    showScreen('screen-shared');
+                    return;
+                }
+
+                if (left <= 0) {
+                    clearInterval(timer);
+                    if(el) el.textContent = "00:00";
+                    setPersistentState('tp_phase_' + today, expiredPhaseValue);
+                    showScreen(expiredScreenId);
+                    return;
+                }
+
+                if(el) {
+                    const m = String(Math.floor(left / 60)).padStart(2, '0');
+                    const s = String(left % 60).padStart(2, '0');
+                    el.textContent = `${m}:${s}`;
+                }
+            }, 1000);
+        }
+
+        function openModal(id) { 
+            const overlay = document.getElementById(id);
+            if (overlay) {
+                overlay.style.display = 'flex';
+                setTimeout(() => overlay.classList.add('show'), 10);
+            }
+        }
+        
+        function closeModal() { 
+            document.querySelectorAll('.overlay').forEach(o => {
+                o.classList.remove('show');
+                setTimeout(() => { o.style.display = 'none'; }, 300);
+            });
+        }
+
+        function issueTicket() {
+            closeModal();
+            const today = getToday();
+
+            if (getPersistentState('tp_auth_' + today) !== 'true') {
+                alert("クーポンを発行するには、再度二次元コードを読み込んでください。");
+                showScreen('screen-shared');
+                return;
+            }
+
+            const currentPhase = getPersistentState('tp_phase_' + today);
+            if (currentPhase === 'used') {
+                alert("本日は既に使用済みです。");
+                showScreen('screen-already');
+                return;
+            }
+            if (currentPhase === 'expired-p2') {
+                alert("利用期限が切れています。");
+                showScreen('screen-expired-p2');
+                return;
+            }
+
+            setPersistentState('tp_phase_' + today, 'p2');
+            showScreen('screen-step2');
+            startTimer('tp_p2_start_' + today, P2_LIMIT, 'timer-p2', 'screen-expired-p2', 'expired-p2');
+        }
+
+        function executeUse() {
+            closeModal();
+            const today = getToday();
+
+            if (getPersistentState('tp_auth_' + today) !== 'true') {
+                alert("クーポンを利用するには、再度二次元コードを読み込んでください。");
+                showScreen('screen-shared');
+                return;
+            }
+
+            const currentPhase = getPersistentState('tp_phase_' + today);
+            if (currentPhase === 'used') {
+                alert("本日は既に使用済みです。");
+                showScreen('screen-already');
+                return;
+            }
+            if (currentPhase === 'expired-p2') {
+                alert("利用期限が切れています。");
+                showScreen('screen-expired-p2');
+                return;
+            }
+
+            clearInterval(timer); 
+            
+            const ticketEl = document.getElementById('ticket');
+            if (ticketEl) ticketEl.classList.add('used');
+            
+            const useBtn = document.getElementById('use-btn');
+            if (useBtn) {
+                useBtn.classList.remove('use-btn-animated');
+                useBtn.disabled = true;
+                useBtn.style.opacity = '0.5';
+            }
+            
+            setPersistentState('tp_phase_' + today, 'used'); 
+
+            // 🎯【改修ポイント】GASへの通信URLにのみ source=ガチャガチャの森 を付与
+            const sourceName = encodeURIComponent("ガチャガチャの森");
+            const requestUrl = `${GAS_URL}?t=${Date.now()}&fp=${deviceFingerprint}&source=${sourceName}`;
+            fetch(requestUrl, { mode: 'no-cors' }).catch(e => console.log(e));
+
+            setTimeout(() => {
+                document.body.innerHTML = `
+                <div style="text-align:center; padding:40px 20px; font-family:sans-serif; width:100%;">
+                    <span style="font-size:5rem;">✅</span>
+                    <h2 style="font-weight:900; color:#333;">クーポン利用完了</h2>
+                    <p style="font-weight:bold; color:#666; line-height:1.5;">この画面はもう使えません。<br>タブを完全に閉じてください。</p>
+                    <div style="background:#fff; border:2px solid #ccc; padding:15px; border-radius:12px; margin-top:30px;">
+                        <p style="color:#d32f2f; font-size:0.85rem; font-weight:bold; margin:0;">※再度利用するには、明日以降に<br>二次元コードを読み直す必要があります。</p>
+                        <p style="color:#999; font-size:0.7rem; margin-top:10px;">ID: ${deviceFingerprint}</p>
+                    </div>
+                </div>`;
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
